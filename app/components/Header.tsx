@@ -10,17 +10,13 @@ export function Header({ toggleSidebar }: HeaderProps) {
   return (
     <header className="bg-orange-600 text-primary-foreground px-4 flex justify-between items-center py-2">
       <div className="flex items-center">
-        <Button
-          variant="ghost"
-          className="mr-2 md:hidden"
-          onClick={toggleSidebar}
-        >
+        <Button variant="ghost" className="md:hidden" onClick={toggleSidebar}>
           <Menu />
         </Button>
         <Image
           src="/logoipsum-332.svg"
           alt="Logo"
-          className="mr-2 ml-4"
+          className="mr-2"
           width={25}
           height={25}
         />
@@ -28,7 +24,6 @@ export function Header({ toggleSidebar }: HeaderProps) {
       </div>
       <nav>
         <Button variant="ghost">Home</Button>
-        <Button variant="ghost">About</Button>
         <Button variant="ghost">Contact</Button>
       </nav>
     </header>
