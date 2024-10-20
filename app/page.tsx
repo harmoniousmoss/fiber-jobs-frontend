@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Header } from "./components/Header";
 import { Sidebar } from "./components/Sidebar";
-import { MainContent } from "./components/MainContent";
 import { Footer } from "./components/Footer";
+import { UnJob } from "./components/UnJobs";
 
 export default function UNJob() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -16,7 +16,7 @@ export default function UNJob() {
       <Header toggleSidebar={toggleSidebar} />
       <div className="flex flex-1">
         <Sidebar isOpen={sidebarOpen} />
-        <MainContent />
+        <UnJob />
       </div>
       <Footer />
     </div>
