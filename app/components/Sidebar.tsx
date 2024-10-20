@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Info, Briefcase } from "lucide-react";
+import { Briefcase } from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,14 +11,6 @@ export function Sidebar({ isOpen }: SidebarProps) {
       className={`bg-muted w-64 p-4 ${isOpen ? "block" : "hidden"} md:block`}
     >
       <nav className="space-y-4">
-        {/* Home Menu */}
-        <div>
-          <h2 className="text-xl font-bold mb-2">Home</h2>
-          <Button variant="ghost" className="w-full justify-start">
-            <Info className="h-5 w-5 mr-2" /> About
-          </Button>
-        </div>
-
         {/* Remote Source Menu */}
         <div>
           <h2 className="text-xl font-bold mb-2">Remote Source</h2>
