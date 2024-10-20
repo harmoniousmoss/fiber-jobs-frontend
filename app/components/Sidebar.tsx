@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Info, Briefcase } from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -14,7 +15,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
         <div>
           <h2 className="text-xl font-bold mb-2">Home</h2>
           <Button variant="ghost" className="w-full justify-start">
-            About
+            <Info className="h-5 w-5 mr-2" /> About
           </Button>
         </div>
 
@@ -22,7 +23,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
         <div>
           <h2 className="text-xl font-bold mb-2">Remote Source</h2>
           <Button variant="ghost" className="w-full justify-start">
-            UN Jobs
+            <Briefcase className="h-5 w-5 mr-2" /> UN Jobs
           </Button>
         </div>
       </nav>
