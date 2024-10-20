@@ -38,6 +38,10 @@ export function MainContent() {
     fetchJobs();
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
     return new Intl.DateTimeFormat("en-GB", {
@@ -75,21 +79,24 @@ export function MainContent() {
       <h2 className="text-2xl font-bold mb-4">UN Job Remote</h2>
 
       <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center space-x-2">
+        {/* Search Input with Icon */}
+        <div className="relative w-64">
           <Input
             type="text"
             placeholder="Search jobs..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-64"
+            className="pr-10"
           />
-          <Button variant="outline" size="icon">
-            <Search className="h-4 w-4" />
-          </Button>
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
         </div>
+
+        <Button variant="outline" onClick={() => console.log("Exporting...")}>
+          Export to Excel
+        </Button>
       </div>
 
-      {jobs.length === 0 ? (
+      {filteredJobs.length === 0 ? (
         <p>No jobs available.</p>
       ) : (
         <div className="overflow-x-auto">
