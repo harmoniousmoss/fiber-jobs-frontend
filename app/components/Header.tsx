@@ -24,6 +24,7 @@ export function Header({ toggleSidebar }: HeaderProps) {
       </div>
       <nav>
         <Button variant="ghost">Home</Button>
+        <Button variant="ghost">About</Button>
         <Button variant="ghost">Contact</Button>
       </nav>
     </header>
