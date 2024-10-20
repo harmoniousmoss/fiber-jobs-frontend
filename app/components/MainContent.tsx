@@ -1,24 +1,7 @@
 import { useState, useEffect } from "react";
-import { Trash2, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 interface Job {
   id: number;
@@ -27,28 +10,41 @@ interface Job {
   link: string;
 }
 
-interface MainContentProps {
-  initialJobs?: Job[];
-}
-
-export function MainContent({ initialJobs = [] }: MainContentProps) {
+export function MainContent() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [jobToDelete, setJobToDelete] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
+
+  const fetchJobs = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/jobs`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch jobs");
+      }
+      const data = await response.json();
+      setJobs(data);
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (initialJobs.length > 0) {
-      setJobs(initialJobs);
-    }
-    setIsLoading(false);
-  }, [initialJobs]);
+    fetchJobs();
+  }, []);
 
-  const deleteJob = (id: number) => {
-    setJobs(jobs.filter((job) => job.id !== id));
-    setJobToDelete(null);
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }).format(date);
   };
 
   const filteredJobs = jobs.filter((job) =>
@@ -61,8 +57,13 @@ export function MainContent({ initialJobs = [] }: MainContentProps) {
     currentPage * itemsPerPage
   );
 
-  const exportToExcel = () => {
-    console.log("Exporting to Excel...");
+  const getPaginationRange = () => {
+    const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+    const endPage = Math.min(startPage + 9, pageCount);
+    return Array.from(
+      { length: endPage - startPage + 1 },
+      (_, i) => startPage + i
+    );
   };
 
   if (isLoading) {
@@ -86,86 +87,55 @@ export function MainContent({ initialJobs = [] }: MainContentProps) {
             <Search className="h-4 w-4" />
           </Button>
         </div>
-        <Button variant="outline" onClick={exportToExcel}>
-          Export to Excel
-        </Button>
       </div>
 
       {jobs.length === 0 ? (
         <p>No jobs available.</p>
       ) : (
-        <>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">No</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Link</TableHead>
-                <TableHead className="w-[100px]">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        <div className="overflow-x-auto">
+          <table className="table-auto w-full border-collapse border border-gray-300">
+            <thead className="bg-gray-200">
+              <tr>
+                <th className="w-auto px-2 py-1 border border-gray-300 text-center">
+                  No
+                </th>
+                <th className="w-auto px-2 py-1 border border-gray-300 text-center">
+                  Date
+                </th>
+                <th className="px-4 py-2 border border-gray-300 text-left">
+                  Title
+                </th>
+                <th className="w-auto px-2 py-1 border border-gray-300 text-center">
+                  Link
+                </th>
+              </tr>
+            </thead>
+            <tbody>
               {paginatedJobs.map((job, index) => (
-                <TableRow key={job.id}>
-                  <TableCell>
+                <tr key={job.id} className="even:bg-gray-100">
+                  <td className="px-2 py-1 border border-gray-300 text-center">
                     {(currentPage - 1) * itemsPerPage + index + 1}
-                  </TableCell>
-                  <TableCell>{job.date}</TableCell>
-                  <TableCell>{job.title}</TableCell>
-                  <TableCell>
-                    <Button variant="link" asChild>
-                      <a
-                        href={job.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        View Job
-                      </a>
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setJobToDelete(job.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Confirm Deletion</DialogTitle>
-                          <DialogDescription>
-                            Are you sure you want to delete this job listing?
-                            This action cannot be undone.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter>
-                          <Button
-                            variant="outline"
-                            onClick={() => setJobToDelete(null)}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            onClick={() =>
-                              jobToDelete && deleteJob(jobToDelete)
-                            }
-                          >
-                            Delete
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                  <td className="px-2 py-1 border border-gray-300 text-center">
+                    {formatDate(job.date)}
+                  </td>
+                  <td className="px-4 py-2 border border-gray-300">
+                    {job.title}
+                  </td>
+                  <td className="px-2 py-1 border border-gray-300 text-center">
+                    <a
+                      href={job.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 underline"
+                    >
+                      View Job
+                    </a>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
 
           <div className="flex justify-center items-center space-x-2 mt-4">
             <Button
@@ -176,7 +146,7 @@ export function MainContent({ initialJobs = [] }: MainContentProps) {
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            {Array.from({ length: pageCount }, (_, i) => i + 1).map((page) => (
+            {getPaginationRange().map((page) => (
               <Button
                 key={page}
                 variant={currentPage === page ? "default" : "outline"}
@@ -196,7 +166,7 @@ export function MainContent({ initialJobs = [] }: MainContentProps) {
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-        </>
+        </div>
       )}
     </main>
   );
